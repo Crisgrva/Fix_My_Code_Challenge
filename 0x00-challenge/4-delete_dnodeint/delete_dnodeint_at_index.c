@@ -11,39 +11,43 @@
  */
 int delete_dnodeint_at_index(dlistint_t **head, unsigned int index)
 {
-	dlistint_t *aux1 = *head, *aux2 = *head, *to_delete = *head;
-	unsigned int node = 0;
+	dlistint_t *saved_head;
+	dlistint_t *tmp;
+	unsigned int p;
 
 	if (*head == NULL)
+	{
 		return (-1);
-	if (index == 0)
+	}
+	saved_head = *head;
+	p = 0;
+	while (p < index && *head != NULL)
 	{
-		if ((*head)->next != NULL)
+		*head = (*head)->next;
+		p++;
+	}
+	if (p != index)
+	{
+		*head = saved_head;
+		return (-1);
+	}
+	if (0 == index)
+	{
+		tmp = (*head)->next;
+		free(*head);
+		*head = tmp;
+		if (tmp != NULL)
 		{
-			aux1->next->prev = NULL;
-			*head = (*head)->next;
+			tmp->prev = NULL;
 		}
-		else
-			*head = NULL;
-		free(to_delete);
-		return (1);
 	}
-	to_delete = to_delete->next;
-	aux2 = aux2->next;
-	while (aux2 && node < (index - 1))
+	else
 	{
-		node++;
-		aux1 = aux1->next;
-		aux2 = aux2->next;
-		to_delete = to_delete->next;
+		(*head)->prev->next = (*head)->next;
+		if ((*head)->next)
+			(*head)->next->prev = (*head)->prev;
+		free(*head);
+		*head = saved_head;
 	}
-	if (node == (index - 1))
-	{
-		aux1->next = aux2->next;
-		if (aux2->next != NULL)
-			aux2->next->prev = aux1;
-		free(to_delete);
-		return (1);
-	}
-	return (-1);
+	return (1);
 }
